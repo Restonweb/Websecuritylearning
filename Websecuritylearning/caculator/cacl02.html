@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIV版计算器</title>
+    <style>
+        /* 设置顶部标题栏样式 */
+        #top {
+            width:450px;
+            height:50px;
+            margin:auto;
+            background-color: gray;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        #top .P {
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin-left: 10px;
+            border-radius: 10px;
+            margin-top:15px;
+        }
+
+        #top .R {
+            background-color: red;
+        }
+        #top .G {
+            background-color: green;
+        }
+        #top .B {
+            background-color: blue;
+        }
+
+        #title{
+            font-size: 20px;
+            color:white;
+            float:right;
+            margin-top: 10px;
+            margin-right:10px;
+        }
+
+        /* 设置结果显示栏样式 */
+        #result {
+            width: 446px;
+            height: 50px;
+            margin:auto;
+            background-color: white;
+            border: solid 2px red;
+        }
+
+        /* 设置按钮区域样式 */
+        #button {
+            width: 450px;
+            height:422px;
+            background-color: gray;
+            margin:auto;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        #button div{
+            width: 108px;
+            height: 80px;
+            float: left;
+            background-color: aqua;
+            margin:2px;
+            text-align: center;
+            line-height:80px;
+            font-size: 32px;
+        }
+        #button div:hover{
+            background-color: rgb(0, 255, 38);
+            font-size: 50px;
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="top">
+        <div class="P R"></div>
+        <div class="P G"></div>
+        <div class="P B"></div>
+        <div id="title">郭哥计算器</div>
+    </div>
+
+    <div id="result"></div>
+
+    <div id="button">
+        <div>AC</div>
+        <div>+/-</div>
+        <div>%</div>
+        <div>/</div>
+        <div>7</div>
+        <div>8</div>
+        <div>9</div>
+        <div>*</div>
+        <div>4</div>
+        <div>5</div>
+        <div>6</div>
+        <div>-</div>
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+        <div>+</div>
+        <div>0</div>
+        <div>删除</div>
+        <div>.</div>
+        <div>=</div>
+    </div>
+</body>
+</html>

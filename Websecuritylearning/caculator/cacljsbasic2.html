@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIV版计算器</title>
+    <style>
+        /* 设置顶部标题栏样式 */
+        #top {
+            width:450px;
+            height:50px;
+            margin:auto;
+            background-color: gray;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        #top .P {
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin-left: 10px;
+            border-radius: 10px;
+            margin-top:15px;
+            margin-left:10px;
+        }
+
+        #top .R {
+            background-color: red;
+        }
+        #top .G {
+            background-color: green;
+        }
+        #top .B {
+            background-color: blue;
+        }
+
+        #title{
+            font-size: 20px;
+            color:white;
+            float:right;
+            margin-top: 10px;
+            margin-right:10px;
+        }
+
+        /* 设置结果显示栏样式 */
+        #result {
+            width: 436px;
+            height: 50px;
+            margin:auto;
+            background-color: white;
+            border: solid 2px red;
+            text-align: right;
+            font-size: 32px;
+            padding-right: 10px;
+        }
+
+        /* 设置按钮区域样式 */
+        #button {
+            width: 450px;
+            height:422px;
+            background-color: gray;
+            margin:auto;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        #button div{
+            width: 108px;
+            height: 80px;
+            float: left;
+            background-color: aqua;
+            margin:2px;
+            text-align: center;
+            line-height:80px;
+            font-size: 32px;
+        }
+        #button div:hover{
+            background-color: rgb(0, 255, 38);
+            font-size: 50px;
+            cursor:pointer;
+        }
+    </style>
+
+    <!-- 下面是JS代码 -->
+    <script type="text/javascript">
+
+         isPointExist = false;
+
+        function clickNumber(Num){
+            var result = document.getElementById("result");
+            result.innerHTML += Num;
+        }
+
+        //输入运算符
+        function clickOpreator(OP){
+            var result = document.getElementById("result");
+            if(result.innerHTML == ''){
+                window.alert("你还没有输入内容！")
+            }else{
+                getLastChar(OP);
+            }
+        }
+        //计算结果
+        function doCacl(){
+            var result = document.getElementById("result");
+            var expression = result.innerHTML;
+            if(result.innerHTML == ''){
+                window.alert("你还没有输入内容！")
+            }else{
+                result.innerHTML = eval(expression);
+            }
+        }
+        //清空结果
+        function doClear(){
+            document.getElementById("result").innerHTML = "";
+            isPointExist = false;
+        }
+        //删除一位
+        function doDelete(){
+            var result = document.getElementById("result");
+            var len = result.innerHTML.length;
+            var last = result.innerHTML.charAt(len - 1);
+            if(last == '.'){
+                result.innerHTML = result.innerHTML.substr(0,len-1);
+                isPointExist = false;
+            }else{
+                result.innerHTML = result.innerHTML.substr(0,len-1);
+            }
+        }
+
+        //获取字符串最后一个字符
+        function getLastChar(OP){
+            var result = document.getElementById("result");
+            var string = result.innerHTML;
+            var len = string.length;
+            //window.alert(string[1]);
+            var last = string.charAt(len - 1);
+            if(OP =='.' && isPointExist == true){
+                last += '';
+            }else if(OP == '.' && isPointExist == false){
+                isPointExist = true;
+                result.innerHTML += OP;
+            }else if(last == '+' || last == '-' || last == '*' || last == '/' || last == '%'){
+                last = OP;
+                isPointExist = false;
+            }else{
+                result.innerHTML += OP;
+                isPointExist = false;
+            }
+        }
+
+
+    </script>
+</head>
+
+<body>
+    <div id="top">
+        <div class="P R"></div>
+        <div class="P G"></div>
+        <div class="P B"></div>
+        <div id="title">郭哥计算器</div>
+    </div>
+
+    <div id="result" name="result"></div>
+
+    <div id="button">
+        <div onclick="doClear()">AC</div>
+        <div onclick="getLastChar()">+/-</div>
+        <div onclick="clickOpreator('%')">%</div>
+        <div onclick="clickOpreator('/')">/</div>
+        <div onclick="clickNumber(7)">7</div>
+        <div onclick="clickNumber(8)">8</div>
+        <div onclick="clickNumber(9)">9</div>
+        <div onclick="clickOpreator('*')">*</div>
+        <div onclick="clickNumber(4)">4</div>
+        <div onclick="clickNumber(5)">5</div>
+        <div onclick="clickNumber(6)">6</div>
+        <div onclick="clickOpreator('-')">-</div>
+        <div onclick="clickNumber(1)">1</div>
+        <div onclick="clickNumber(2)">2</div>
+        <div onclick="clickNumber(3)">3</div>
+        <div onclick="clickOpreator('+')">+</div>
+        <div onclick="clickNumber(0)">0</div>
+        <div onclick="doDelete()">删除</div>
+        <div onclick="clickOpreator('.')">.</div>
+        <div onclick="doCacl()">=</div>
+    </div>
+</body>
+</html>

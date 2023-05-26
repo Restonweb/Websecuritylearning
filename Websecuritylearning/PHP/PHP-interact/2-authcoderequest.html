@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>request</title>
+    <script>    
+    function getcode(){
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange=function(){
+            if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
+                document.getElementById("vcode").setAttribute("src",xmlhttp.responseURL);
+            }
+        }
+        // xmlhttp.open("GET","2-login.php?q=g");
+        xmlhttp.open("GET","2-authcode.php");
+        xmlhttp.send();
+    }
+    
+    
+    
+    </script>
+</head>
+<body>
+    
+    <div class="eee"><img id="vcode" src="../../image/vcodedefault.png"  onclick="getcode()"></div>
+</body>
+</html>
