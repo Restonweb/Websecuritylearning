@@ -29,22 +29,25 @@
         }
     </style>
     <script type="text/javascript" src="jquery-3.7.0.min.js"></script>
-    <script>
-        function dodelete(){
-            var deleteid;
-            sscanf($("#delete").val(),"删除文章d%",deleteid);
-            window.alert("deleteid");
+    <script>function dodelete($arcticleid){
+        var XMlde = new XMLHttpRequest();
+        XMlde.onreadystatechange=function(){
+            if(XMlde.readyState == 4 && XMlde.status == 200){
+                // window.alert("已删除文章id为" + $arcticleid + "的文章");
+                eval(XMlde.responseText);
+            }
         }
+        XMlde.open("GET","2-delete.php?articleid=" + $arcticleid);
+    }
     </script>
 </head>
 <body>
-    <button></button>
     <?php
     $conn = mysqli_connect('127.0.0.1','root','','test');
 
     mysqli_query($conn,"set names utf8");
 
-    $sql = "select articleid,author,headline,viewcount,createtime from article where articleid<5";
+    $sql = "select articleid,author,headline,viewcount,createtime from article where articleid<10";
     $result = mysqli_query($conn,"$sql");
 
     //将数据库查询的结果集中的数据取出，保存到一个数组中
@@ -54,8 +57,6 @@
     // foreach($rows as $row){
     //     echo $row[0] . '-' . $row[1] . '-' . $row[2] . '-' . $row[3] . '-' . $row[4] . "<br/>";
     // }
-    
-
     echo '<table>';
     echo '<tr>';
     echo '<td>' . "文章标号" . '<td/>';
@@ -73,12 +74,15 @@
         echo '<td><a href="2-read.php?id=' . $row[0] . '">' . $row[2] . '<td/>';
         echo '<td>' . $row[3] . '<td/>';
         echo '<td>' . $row[4] . '<td/>';
-        echo '<button class="delete" onclick=' . '"dodelete()"' . '>' . '删除文章' . $row[0] .'</button>';
+        // echo '<button class="delete" onclick=' . '"dodelete()"' . '>' . '删除文章' . $row[0] .'</button>';
+        echo '<button type="button" class="delete" onclick=' . '"dodelete(' . $row[0] . ')"' . '>删除文章' . $row[0] . '</button>';
         echo '<tr/>';
     }
     echo '<table/>';
     mysqli_close($conn);
     ?>
+    <input type="number" class="delete"/>
+    <button type="button" class="delete" onclick="dodelete()"></button>
 </body>
 </html>
 

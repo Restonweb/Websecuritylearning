@@ -18,10 +18,10 @@ $result = mysqli_query($conn,$sql); //result获取到的查询结果，称为结
 
 if(mysqli_num_rows($result) == 1 && $vcode == $_SESSION['vcodes'] ){
     echo 'window.location.href="2-list.php"';
-    $_SESSION['vcodes'] = 00000;
+    $_SESSION['vcodes'] = 66666;
 }else{
     echo "window.alert('登陆失败！')";
-    $_SESSION['vcodes'] = 00000;
+    $_SESSION['vcodes'] = 66666;
 }
 //关闭数据库
 mysqli_close($conn);
