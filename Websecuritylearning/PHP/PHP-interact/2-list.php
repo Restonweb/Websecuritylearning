@@ -29,15 +29,17 @@
         }
     </style>
     <script type="text/javascript" src="jquery-3.7.0.min.js"></script>
-    <script>function dodelete($arcticleid){
+    <script>function dodelete(){
+        var articleid = $("#deleteid").val();
         var XMlde = new XMLHttpRequest();
         XMlde.onreadystatechange=function(){
             if(XMlde.readyState == 4 && XMlde.status == 200){
                 // window.alert("已删除文章id为" + $arcticleid + "的文章");
-                eval(XMlde.responseText);
+                eval(XMlde.response);
             }
         }
-        XMlde.open("GET","2-delete.php?articleid=" + $arcticleid);
+        XMlde.open("GET","2-delete.php?articleid=" + articleid);
+        XMlde.send();
     }
     </script>
 </head>
@@ -47,7 +49,7 @@
 
     mysqli_query($conn,"set names utf8");
 
-    $sql = "select articleid,author,headline,viewcount,createtime from article where articleid<10";
+    $sql = "select articleid,author,headline,viewcount,createtime from article where articleid<255";
     $result = mysqli_query($conn,"$sql");
 
     //将数据库查询的结果集中的数据取出，保存到一个数组中
@@ -64,7 +66,6 @@
     echo '<td>' . "标题" . '<td/>';
     echo '<td>' . "浏览次数" . '<td/>';
     echo '<td>' . "创建时间" . '<td/>';
-    echo '<td>' . "" . '<td/>';
     echo '<tr/>';
     //遍历结果在表格中显示
     foreach($rows as $row){
@@ -75,21 +76,20 @@
         echo '<td>' . $row[3] . '<td/>';
         echo '<td>' . $row[4] . '<td/>';
         // echo '<button class="delete" onclick=' . '"dodelete()"' . '>' . '删除文章' . $row[0] .'</button>';
-        echo '<button type="button" class="delete" onclick=' . '"dodelete(' . $row[0] . ')"' . '>删除文章' . $row[0] . '</button>';
         echo '<tr/>';
     }
     echo '<table/>';
     mysqli_close($conn);
     ?>
-    <input type="number" class="delete"/>
-    <button type="button" class="delete" onclick="dodelete()"></button>
+    <input type="number" id="deleteid"/>
+    <button type="button" class="delete" onclick="dodelete()">Delete</button>
 </body>
 </html>
 
 <!-- 
     1、完善登录过程，完善验证码的验证
-    2、设计一个新页面，实现用户的注册（用户名不能重复，如果可能，试着上传一张头像）
-    3、实现文章列表的页面，同时在该页面添加“删除”按钮，用AJAX完成对文章的删除--working
+    2、设计一个新页面，实现用户的注册（用户名不能重复，如果可能，试着上传一张头像）-working
+    3、实现文章列表的页面，同时在该页面添加“删除”按钮，用AJAX完成对文章的删除--ok
     4、实现read.php的文章阅读页面。--ok
     5、实现一个新页面，可以新增一篇文章。
  -->
