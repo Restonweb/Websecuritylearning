@@ -45,6 +45,10 @@
 </head>
 <body>
     <?php
+    session_start();
+    if($_SESSION['islogin'] == false){
+        die("请先登录再进行操作");
+    }
     $conn = mysqli_connect('127.0.0.1','root','','test');
 
     mysqli_query($conn,"set names utf8");

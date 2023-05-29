@@ -1,5 +1,6 @@
 <?php
 session_start();
+$_SESSION['islogin'] = false;
 $q=$_REQUEST['q'];
 if($q == 'p'){
     $username = $_POST['username'];
@@ -18,9 +19,11 @@ $result = mysqli_query($conn,$sql); //result获取到的查询结果，称为结
 
 if(mysqli_num_rows($result) == 1 && $vcode == $_SESSION['vcodes'] ){
     echo 'window.location.href="2-list.php"';
+    $_SESSION['islogin'] = true;
     $_SESSION['vcodes'] = 66666;
 }else{
     echo "window.alert('登陆失败！')";
+    $_SESSION['islogin'] = false;
     $_SESSION['vcodes'] = 66666;
 }
 //关闭数据库
