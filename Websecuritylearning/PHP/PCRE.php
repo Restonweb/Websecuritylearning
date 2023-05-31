@@ -54,7 +54,7 @@ function re_01(){
 }
 //查找
 function re_find(){
-    $source = "google is Google";
+    $source = "google is google";
     $pattern = "/go/";
     $matchedTimes = preg_match_all($pattern,$source,$result);
     print_r($result);//$result是一个数组变量，输出需要使用print_r或var_dump
@@ -69,6 +69,6 @@ function re_replace(){
     echo "$source";
 }
 //re_01();
-//re_find();
-re_replace();
+re_find();
+//re_replace();
 ?>
