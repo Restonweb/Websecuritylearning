@@ -6,13 +6,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="jquery-3.7.0.min.js"></script>
     <title>文章列表(json.ver)</title>
-    <script>
-        window.onload = function(){
-            window.alert("hi");
+    <style>
+        table{
+            width:800px;
+            margin:auto;
+            border:solid 1px green;
+            border-spacing: 0px;
         }
+        td{
+            border:solid 1px green;
+            height: 20px;
+        }
+        table tr button.delete{
+            text-decoration: underline;
+            font-size: smaller;
+            width: 90px;
+            text-align: center;
+        }
+        table tr button.delete:hover{
+            color:red;
+            cursor: pointer;
+            font-size: small;
+        }
+    </style>
+    <script>
+        function dodelete(){
+        var articleid = $("#deleteid").val();
+        var XMlde = new XMLHttpRequest();
+        XMlde.onreadystatechange=function(){
+            if(XMlde.readyState == 4 && XMlde.status == 200){
+                // window.alert("已删除文章id为" + $arcticleid + "的文章");
+                eval(XMlde.response);
+            }
+        }
+        XMlde.open("GET","2-delete.php?articleid=" + articleid);
+        XMlde.send();
+    }
+    function list() {
+            $.get('3-list_json.php', function(data){
+                // 后台响应给前端的JSON数据，其content-type有可能是:
+                // 1、text/plain或text/html，此时必须用eval执行将其转成JS对象
+                // 2、application/json，则不需要eval，直接使用即可
+                var data = eval(data); 
+                var content = "";
+                // data.forEach(function(article) {
+                data.forEach(article => {
+                    content += "<tr>";
+                    content += "<td>" + article['articleid'] + "</td>";
+                    content += "<td>" + article['author'] + "</td>";
+                    content += "<td><a href='2-read.php?id=" + article['articleid'] + "'>" + article['headline'] + "</td>";
+                    content += "<td>" + article['viewcount'] + "</td>";
+                    content += "<td>" + article['createtime'] + "</td>";
+                    content += "</tr>";
+                });
+                $("#articletable").append(content);
+                // $("#articleTable").css('display', '');
+            });
+        }
+        // function loadd(){
+        //     var getjson = new XMLHttpRequest();
+        //     getjson.onreadystatechange = function(){
+        //         if(getjson.readyState == 4 || getjson.status == 200){
+        //             var data = eval(getjson.responseText);//获取到的是Text/html类型，eval一下，使其变为json类型
+        //             var content = "";
+        //             data.foreach(article => {
+        //                 content += "<tr>";
+        //                 content += "<td>"+ article["articleid"] + "</td>";
+        //                 content += "<td>"+ article["author"] + "</td>";
+        //                 content += "<td>"+ article["headline"] + "</td>";
+        //                 content += "<td>"+ article["viewcount"] + "</td>";
+        //                 content += "<td>"+ article["createtime"] + "</td>";
+        //                 content += "</tr>";
+        //             });
+        //             // document.getElementById("articletable").append(content);
+        //             $("#articletable").append(content);
+        //         }
+        //     }
+        //     getjson.open("GET","3-list_json.php");
+        //     getjson.send();
+        // }
     </script>
 </head>
 <body>
-    
+    <table id="articletable">
+         <tr>
+         <td>"文章标号"</td>
+         <td>"作者"</td>
+         <td>"标题"</td>
+         <td>"浏览次数"</td>
+         <td>"创建时间"</td>
+         </tr>
+    </table>
+    <button onclick="list()">load</button>
 </body>
 </html>
