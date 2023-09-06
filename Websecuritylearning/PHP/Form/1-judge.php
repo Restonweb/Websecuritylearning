@@ -1,4 +1,3 @@
-
 <?php
 $set = 1;
 $Number = $_GET["num"];
