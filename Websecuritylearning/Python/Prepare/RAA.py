@@ -14,6 +14,7 @@ from cryptography.hazmat.primitives.asymmetric import ec
 import cryptography.exceptions
 from datetime import datetime
 import time
+from SM2Enc import sm2Enc
 
 class RAA:
     P = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
@@ -43,11 +44,11 @@ class EV:
         #TODO:Get Kpub through network
         loaded_Kpub = serialization.load_pem_public_key()#Load the serialized Public Key
         pass
+    
     def Enc(self,key,*mess):
         self.__mess = '||'.join(mess)
         pass
     
 ev = EV()
-
 # t = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 # print(t) 
