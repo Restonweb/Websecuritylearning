@@ -30,6 +30,7 @@ class RAA:
         hash_moded = int(hash_original,base=16)
         while hash_moded > (RAA.P):hash_moded %= RAA.P
         return hex(hash_moded)
+ra = RAA()
 
 class EV:
     Kevp = None
@@ -39,11 +40,14 @@ class EV:
         EV.Kevp = self.__kevp.public_bytes(serialization.Encoding.PEM,serialization.PublicFormat.SubjectPublicKeyInfo)
     
     def Reg(self,IDEV,IDNEV,IDarea):
+        #TODO:Get Kpub through network
+        loaded_Kpub = serialization.load_pem_public_key()#Load the serialized Public Key
+        pass
+    def Enc(self,key,*mess):
+        self.__mess = '||'.join(mess)
         pass
     
-    def Enc(self,key,m1,m2,m3,m4):
-        pass
-    
-    
+ev = EV()
+
 # t = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-# print(t)
+# print(t) 
