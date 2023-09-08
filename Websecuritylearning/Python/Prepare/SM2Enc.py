@@ -42,8 +42,9 @@ class sm2Enc:
         return self.intTbytes(x,l)
     
     def bytesTfEle(self,x):
-        self.bytesTint(x)
-        
+        fEle = self.bytesTint(x)
+        return(fEle)
+    
     def fEleTint(self,x):
         return x
     
@@ -231,11 +232,8 @@ class sm2Enc:
         bytes_l1 = 2*l+1
         hex_l1 = bytes_l1 * 2
         C_bytes = self.hexTbytes(C)
-        print("将十六进制密文串转换为字节串是：", C_bytes)
         C1_bytes = C_bytes[0:2*l+1]
-        print("从密文字节串中取出的C1的字节串是：", C1_bytes)
         C1 = self.bytesTpoint(C1_bytes)
-        print("将C1字节串转换为椭圆曲线上的点是：", C1)
         if not self.isOnCurve(args,C1):
             raise Exception("Point Error:C1 Point is not on the EC!")
         x1,y1 = C1[0],C1[1]
@@ -273,37 +271,36 @@ class sm2Enc:
         return M
         
     def get_args(self):
-        p = eval('0x' + '8542D69E 4C044F18 E8B92435 BF6FF7DE 45728391 5C45517D 722EDB8B 08F1DFC3'.replace(' ', ''))
-        a = eval('0x' + '787968B4 FA32C3FD 2417842E 73BBFEFF 2F3C848B 6831D7E0 EC65228B 3937E498'.replace(' ', ''))
-        b = eval('0x' + '63E4C6D3 B23B0C84 9CF84241 484BFE48 F61D59A5 B16BA06E 6E12D1DA 27C5249A'.replace(' ', ''))
+        p = eval('0x' + '8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3')
+        a = eval('0x' + '787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498')
+        b = eval('0x' + '63E4C6D3B23B0C849CF84241484BFE48F61D59A5B16BA06E6E12D1DA27C5249A')
         h = 1
-        xG = eval('0x' + '421DEBD6 1B62EAB6 746434EB C3CC315E 32220B3B ADD50BDC 4C4E6C14 7FEDD43D'.replace(' ', ''))
-        yG = eval('0x' + '0680512B CBB42C07 D47349D2 153B70C4 E5D7FDFC BFA36EA1 A85841B9 E46E09A2'.replace(' ', ''))
+        xG = eval('0x' + '421DEBD61B62EAB6746434EBC3CC315E32220B3BADD50BDC4C4E6C147FEDD43D')
+        yG = eval('0x' + '0680512BCBB42C07D47349D2153B70C4E5D7FDFCBFA36EA1A85841B9E46E09A2')
         G = (xG, yG)            # G 是基点
-        n = eval('0x' + '8542D69E 4C044F18 E8B92435 BF6FF7DD 29772063 0485628D 5AE74EE7 C32E79B7'.replace(' ', ''))
+        n = eval('0x' + '8542D69E4C044F18E8B92435BF6FF7DD297720630485628D5AE74EE7C32E79B7')
         args = (p, a, b, h, G, n)           # args是存储椭圆曲线参数的元组。
         return args
     
     def get_key(self):
-        xB = eval('0x' + '435B39CC A8F3B508 C1488AFC 67BE491A 0F7BA07E 581A0E48 49A5CF70 628A7E0A'.replace(' ', ''))
-        yB = eval('0x' + '75DDBA78 F15FEECB 4C7895E2 C1CDF5FE 01DEBB2C DBADF453 99CCF77B BA076A42'.replace(' ', ''))
+        xB = eval('0x' + '435B39CCA8F3B508C1488AFC67BE491A0F7BA07E581A0E4849A5CF70628A7E0A')
+        yB = eval('0x' + '75DDBA78F15FEECB4C7895E2C1CDF5FE01DEBB2CDBADF45399CCF77BBA076A42')
         PB = (xB, yB)           # PB是B的公钥
-        dB = eval('0x' + '1649AB77 A00637BD 5E2EFE28 3FBF3535 34AA7F7C B89463F2 08DDBC29 20BB0DA0'.replace(' ', ''))
+        dB = eval('0x' + '1649AB77A00637BD5E2EFE283FBF353534AA7F7CB89463F208DDBC2920BB0DA0')
         # dB是B的私钥
         key_B = (PB, dB)
         return key_B
 
 #Encryption
-ac = sm2Enc()
-args = ac.get_args()
-key_B = ac.get_key()
-PB,SB = key_B
-print("SB:",SB)
-M = input('Input message:')
-C = ac.sm2_Enc(args,PB,M)
-#Decryption
-D = ac.sm2_Dec(args,SB,C)
-
+# ac = sm2Enc()
+# args = ac.get_args()
+# key_B = ac.get_key()
+# PB,SB = key_B
+# print("SB:",SB)
+# M = input('Input message:')
+# C = ac.sm2_Enc(args,PB,M)
+# #Decryption
+# D = ac.sm2_Dec(args,SB,C)
 
 # print('1',ac.intTbytes(52,10))
 # print('2',ac.bytesTint(b'\x00\x00\x00\x00\x00\x00\x00\x00\x004'))
