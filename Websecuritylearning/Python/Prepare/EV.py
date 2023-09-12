@@ -1,8 +1,4 @@
 from EVV import EV
 
 ev = EV()
-
-for i in range(5):
-    ev.sendmsg()
-    i = ++i
-ev.closeconnect()
+ev.Reg('114514', '1919810', '2')

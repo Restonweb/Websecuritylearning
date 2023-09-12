@@ -1,16 +1,19 @@
-
 from cryptography.hazmat.primitives import hashes
 from datetime import datetime
 import time
 from SM2Enc import sm2Enc
 import socket
+import threading
 
 sm2 = sm2Enc()
 
+
 class RAA:
+    ENCODE = 'utf-8'
     P = '8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3'
     Kpub = None
     MLEN = 1024
+
     def __init__(self):
         self.__RAAkeypair = sm2.get_key()
         self.__kms = self.__RAAkeypair[1]
@@ -18,49 +21,77 @@ class RAA:
         RAA.Kpub = self.__Kp
         self.__networkinit()
 
-    def swhash(self,message):
+    def swhash(self, message):
         Hashcode = hashes.Hash(hashes.SHA512())
-        Hashcode.update(message)
+        Hashcode.update(message.encode())
         hash_original = Hashcode.finalize().hex()
-        hash_moded = int(hash_original,base=16)
-        while hash_moded > (RAA.P):hash_moded %= RAA.P
+        hash_moded = int(hash_original, base=16)
+        while hash_moded > int(RAA.P, base=16): hash_moded %= int(RAA.P, base=16)
         return hex(hash_moded)
+
+    def Vtimestamp(self, timestamp) -> bool:  # 时间戳验证
+        timestamps = timestamp.split('-')
+        time_nows = datetime.utcnow().strftime('%Y-%m-%d-%H-%M-%S')  # '%Y-%m-%d-%H-%M-%S' '0-1-2-3-4-5'
+        time_now = time_nows.split('-')
+        AF = True
+        for i in range(5):  # 一分钟内的时间戳视为有效
+            if timestamps[i] != time_now[i]:
+                AF = False
+        return AF
+
+    def Enc(self, key, *mess):  # list arguments
+        self.__mess = '||'.join(mess)
+        return sm2.sm2_Enc(sm2.get_args(), key, self.__mess)
+
+    def Dec(self, mess):
+        self.Dmess = sm2.sm2_Dec(sm2.get_args(), self.__kms, mess)
+        self.Dlist = self.Dmess.split('||')
+        # print(self.Dlist)
+        return self.Dlist
 
     def __networkinit(self):
         host = '127.0.0.1'
         port = 9696
-        self.tcps = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.tcps.bind((host,port))
+        self.tcps = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.tcps.bind((host, port))
         self.tcps.listen(10)
-        NFLAG = True
+        self.server_main()
+
+    def server_main(self):
+        NF = True
         while True:
-            if NFLAG:
-                print("服务器启动，等待连接...")
-            elif not NFLAG:
-                print("服务器等待下一个连接中...")
-            tcp,addr = self.tcps.accept()
-            NFLAG = False
-            print("连接的客户端：",addr)
-            tcp.send("Hello Client!".encode('utf-8'))
-            while True:
-                data = tcp.recv(RAA.MLEN)
-                if data:
-                    print("收到客户端的消息:", data)
-                if not data:
-                    print("断开的客户端：", addr)
-                    break
-        tcp.close()
+            if NF:
+                print("服务器启动，等待连接......")
+            tcp, Caddr = self.tcps.accept()
+            NF = False
+            print("连接的客户端：", Caddr)
+            AreaPk = 'Kpub:' + str(RAA.Kpub)
+            tcp.send(AreaPk.encode())
+            client_handler = threading.Thread(target=self.client_handle, args=(tcp, Caddr))
+            client_handler.start()
 
-    def closeconnect(self):
-        self.tcps.close()
-        print("服务器已关闭。")
-
-ra = RAA()
-
-
-
-ev = EV()
-Emess =  ev.Reg('114514','114514','2')
-ev.Dec(Emess)
+    def client_handle(self, client_socket, client_addr):
+        while True:
+            try:
+                data = client_socket.recv(self.MLEN).decode()
+            except ConnectionResetError:
+                print("断开的客户端：", client_addr)
+                print("等待下一个连接......")
+                break
+            if not data:
+                pass
+            if data.startswith("Reg1:"):
+                R1list = self.Dec(data.split(":")[1])
+                print("?", R1list)
+                if self.Vtimestamp(R1list[3]):  # 验证成功，计算RID
+                    print("timestamp is vaild!")
+                    client_socket.send("TimeStamp is valid!".encode())
+                    RIDevS = [R1list[0], R1list[1], R1list[2]]
+                    RIDev = self.swhash('||'.join(RIDevS))
+                    print("Generate RIDev:", RIDev)
+                    client_socket.send(f"RIDev:{RIDev}".encode())
+                else:  # 验证未成功，发送错误信息
+                    print("timestamp is invalid!")
+                    client_socket.send("Error:TimeStamp is invalid!".encode())
 # t = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-# print(t) 
+# print(t)

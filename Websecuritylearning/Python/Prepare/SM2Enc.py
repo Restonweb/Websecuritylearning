@@ -62,7 +62,7 @@ class sm2Enc:
         l = (len(s) - 1) // 2
         PC = s[0]
         if PC != 4:
-            raise Exception("PC Error:PC must be b'04")
+            raise Exception("PC Error:PC must be b'04, please reboot the program.")
         x = s[1:l+1]
         y = s[l+1:2*l+1]
         xp = self.bytesTfEle(x)
