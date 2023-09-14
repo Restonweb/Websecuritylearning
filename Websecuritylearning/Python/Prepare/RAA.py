@@ -79,19 +79,35 @@ class RAA:
                 print("等待下一个连接......")
                 break
             if not data:
-                pass
+                continue
             if data.startswith("Reg1:"):
                 R1list = self.Dec(data.split(":")[1])
-                print("?", R1list)
+                # print("?", R1list)
                 if self.Vtimestamp(R1list[3]):  # 验证成功，计算RID
-                    print("timestamp is vaild!")
-                    client_socket.send("TimeStamp is valid!".encode())
+                    print("\033[32mtimestamp is vaild!\033[0m")
+                    client_socket.send("\033[32mTimeStamp is valid!\033[0m".encode())
                     RIDevS = [R1list[0], R1list[1], R1list[2]]
                     RIDev = self.swhash('||'.join(RIDevS))
                     print("Generate RIDev:", RIDev)
                     client_socket.send(f"RIDev:{RIDev}".encode())
                 else:  # 验证未成功，发送错误信息
-                    print("timestamp is invalid!")
+                    print("\033[31mTimestamp is invalid!\033[0m")
                     client_socket.send("Error:TimeStamp is invalid!".encode())
+            elif data.startswith("Reg2:"):
+                p, a, b, h, G, n = sm2.get_args()
+                R2list = self.Dec(data.split(":")[1])
+                Bist, Kevist, RIDevst, IDareast = R2list
+                kevt = Kevist[1:-1].split(",")
+                Kevi = (int(kevt[0]), int(kevt[1]))
+                kmult = sm2.multPoint(Kevi, self.__kms, p, a)
+                E1 = sm2.bytesTint(sm2.pointTbytes(kmult))
+                E2 = eval(RIDevst)
+                E3 = E1 ^ E2
+                Bi = int(Bist)
+                if E3 == Bi:
+                    print("\033[32mBi valid!\033[0m")
+                else:
+                    print("\033[31mBi invalid!\033[0m")
+                    client_socket.send("Error:Registration Failed!".encode())
 # t = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 # print(t)

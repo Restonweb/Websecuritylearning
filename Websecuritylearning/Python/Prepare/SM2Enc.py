@@ -187,7 +187,12 @@ class sm2Enc:
             if i == '1':
                 Q = self.pointAdd(P,Q,p)
         return Q
-    
+
+    def pointstrTpointtuple(self,PS):
+        PTS = PS[1:-1].split(",")
+        PT = (int(PTS[0]),int(PTS[1]))
+        return PT
+
     def isOnCurve(self,args,P):
         p,a,b,h,G,n = args
         x,y = P
@@ -291,6 +296,12 @@ class sm2Enc:
         key_B = (PB, dB)
         return key_B
 
+    def gen_key(self):
+        p, a, b, h, G, n = self.get_args()
+        k = random.randint(1, p-1)
+        K = self.multPoint(G, k, p, a)
+        keypair = (K, k)
+        return keypair
 #Encryption
 # ac = sm2Enc()
 # args = ac.get_args()
