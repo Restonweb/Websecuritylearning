@@ -1,3 +1,5 @@
+import random
+
 from cryptography.hazmat.primitives import hashes
 from datetime import datetime
 import time
@@ -13,6 +15,7 @@ class RAA:
     P = '8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3'
     Kpub = None
     MLEN = 1024
+    deltaT = 32767
 
     def __init__(self):
         self.__RAAkeypair = sm2.get_key()
@@ -106,6 +109,16 @@ class RAA:
                 Bi = int(Bist)
                 if E3 == Bi:
                     print("\033[32mBi valid!\033[0m")
+                    r1 = random.randint(1, p-1)
+                    kmultl = sm2.multPoint(Kevi, self.__kms, p, a)
+                    E1l = sm2.bytesTint(sm2.pointTbytes(kmultl))
+                    E2l = eval(self.swhash(RIDevst))
+                    LIDev = E1l ^ E2l
+                    r1Kp = sm2.multPoint(RAA.Kpub, r1, p, a)
+                    E3t = eval(self.swhash('||'.join([str(r1Kp), str(LIDev), str(RAA.deltaT)])))
+                    Fi = E2l ^ E3t
+                    SIDev = Fi | RAA.deltaT
+                    print(SIDev)
                 else:
                     print("\033[31mBi invalid!\033[0m")
                     client_socket.send("Error:Registration Failed!".encode())

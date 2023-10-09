@@ -14,9 +14,10 @@ class EV:
     Kevp = None
     MLEN = 1024
     Kpub = None
+    IDarea = None
     RIDev = None
     SQLTIMEOUT = 0.01
-
+    
     def __init__(self):
         self.__EVkeypair = sm2.gen_key()
         self.__kevs = self.__EVkeypair[1]
@@ -36,9 +37,9 @@ class EV:
             print("Unable to fetch data")
         IDEV = None
         for row in results:
-            self.IDEV, self.IDNEV, self.RIDev, Kpub, Register, self.IDarea = row
-        if self.IDEV is None:
-            sql = f"INSERT INTO {table_name} VALUES (1,1,1,1,1);"  # 设置初值，因为下面的操作都是UPDATE
+            IDEV, IDNEV, RIDev, Kpub, Register, IDarea = row
+        if IDEV is None:
+            sql = f"INSERT INTO {table_name} VALUES (1,1,1,1,1,1);"  # 设置初值，因为下面的操作都是UPDATE
             try:
                 cursor.execute(sql)
                 db.commit()
@@ -99,7 +100,7 @@ class EV:
                 E1 = sm2.bytesTint(sm2.pointTbytes(kmult))
                 E2 = eval(EV.RIDev)
                 self.Bi = E1 ^ E2
-                print("KpubKevp ^ RIDev = Bi:", self.Bi, type(self.Bi))
+                print("KpubKevp ^ RIDev = Bi:", self.Bi)
             elif data.startswith("Error:"):
                 Error = data.split(':')[1]
                 raise Exception(f"Error:{Error}")
@@ -112,6 +113,7 @@ class EV:
         self.sqlupdate('ev', 'IDarea', IDarea)
         self.sqlupdate('ev', 'Register', register)
         EV.Register = register
+        EV.IDarea = IDarea
         while True:
             if EV.Kpub is None:  # 等待RA发送区域公钥Kpub
                 continue
@@ -127,7 +129,7 @@ class EV:
             if self.Bi is None:
                 continue
             elif self.Bi is not None:
-                reg2 = "Reg2:" + self.Enc(EV.Kpub, str(self.Bi), str(EV.Kevp), EV.RIDev, self.IDarea)
+                reg2 = "Reg2:" + self.Enc(EV.Kpub, str(self.Bi), str(EV.Kevp), EV.RIDev, EV.IDarea)
                 print(reg2)
                 self.client.send(reg2.encode())
                 break
