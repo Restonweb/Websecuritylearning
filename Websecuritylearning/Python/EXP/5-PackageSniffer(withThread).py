@@ -40,12 +40,19 @@ class IPsniffer:
     def processprintData(self):
         while True:
             timestamp = str(datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
-
             data = self.packet_queue.get()
             package = self.decodeIPHeader(data)
             print("%s  --->  %s  %s IPv%s 协议：%s 数据包长度：%s Bytes" % (
-                ("\033[036m" + package['sourceAddress']).center(20, ' ') + "\033[0m", "\033[035m" + package['destinationAddress'].center(20, ' ') + "\033[0m", timestamp,
+                ("\033[036m" + package['sourceAddress']).center(20, ' ') + "\033[0m",
+                "\033[035m" + package['destinationAddress'].center(20, ' ') + "\033[0m", timestamp,
                 package['version'], self.protocolClassify(package['protocol']), package['totalLength']))
+            # self.fillter(package,timestamp,"destinationAddress","192.168.123.54")
+    # def fillter(self, package, timestamp, fillterid, filltervalue):
+    #     if package[fillterid] == filltervalue:
+    #         print("%s  --->  %s  %s IPv%s 协议：%s 数据包长度：%s Bytes" % (
+    #             ("\033[036m" + package['sourceAddress']).center(20, ' ') + "\033[0m",
+    #             "\033[035m" + package['destinationAddress'].center(20, ' ') + "\033[0m", timestamp,
+    #             package['version'], self.protocolClassify(package['protocol']), package['totalLength']))
 
     def protocolClassify(self, PF):
         PF = int(PF)

@@ -3,19 +3,37 @@ import socket
 import threading
 from datetime import datetime
 from PySide6.QtWidgets import QApplication, QWidget
-from PySide6.QtCore import Qt, Slot, Signal, QObject    #Flag Argument
+from PySide6.QtCore import Qt, Slot, Signal, QObject  # Flag Argument
 from Ui_sniffer import Ui_Form
 
-class MyWindow(QWidget,Ui_Form):
+
+class MyWindow(QWidget, Ui_Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.CF = False
+
+    def closeEvent(self, event):
+        self.CF = True
+        event.accept()
+
+
 class IPsniffer(QObject):
     packet_recved = Signal(dict)
+
     def __init__(self):
         super().__init__()
+        self.s = None
+        self.PORT = 0
+        self.app = QApplication([])
+        self.window = MyWindow()
         self.packet_queue = queue.Queue()
+        self.ui_init()
+
+    def ui_init(self):
         self.packet_recved.connect(self.outputr)
+        self.window.ptcset.addItems(["全部协议", "TCP", "UDP", "ICMP", "IPV6", "ESP", "AH", "OSPF", "SCTP"])
+        self.window.ptcset.setCurrentIndex(0)
 
     def start_sniffing(self):
         # 创建两个线程，一个用于数据包捕获，另一个用于数据包解析和打印
@@ -26,58 +44,114 @@ class IPsniffer(QObject):
         capture_thread.start()
         process_thread.start()
 
-        app = QApplication([])
-        self.window = MyWindow()
         self.window.show()
-        app.exec()
+        self.app.exec()
 
         # 等待线程完成
         capture_thread.join()
         process_thread.join()
 
+    def getLocalIP(self):
+        st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        st.connect(("8.8.8.8", 80))
+        LIP = st.getsockname()[0]
+        self.window.selfip.setText("本机IP: %s:%s" % (LIP, self.PORT))
+        st.close()
+        return LIP
+
     def catchIPData(self):
-        HOST = "192.168.123.54"  # 本机IP
-        s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)  # 创建原始套接字
-        s.bind((HOST, 0))
-        s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
-        s.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
-        package = s.recvfrom(65535)
-        s.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
-        s.close()
+        HOST = self.getLocalIP()  # 本机IP
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)  # 创建原始套接字
+        self.s.bind((HOST, self.PORT))
+        self.s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+        self.s.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
+        package = self.s.recvfrom(65535)
+        self.s.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
+        self.s.close()
         return package[0]
 
     def catchData(self):
         while True:
-            data = self.catchIPData()
-            self.packet_queue.put(data)
+            if self.window.startsniff.isChecked():
+                self.window.startsniff.setText("停止抓取")
+                self.window.output.clear()
+                while True:
+                    data = self.catchIPData()
+                    self.packet_queue.put(data)
+                    if self.window.startsniff.isChecked() is False:
+                        self.window.startsniff.setText("抓取")
+                        self.window.selfip.setText("开始抓取以获取IP")
+                        self.s.close()
+                        break
+                    elif self.window.CF is True:
+                        self.window.selfip.setText("开始抓取以获取IP")
+                        self.s.close()
+                        raise Exception("Manual Stop：UI is closed")
+            elif self.window.CF is True:
+                self.s.close()
+                raise Exception("Manual Stop：UI is closed")
+            else:
+                continue
 
     def processprintData(self):
         while True:
             timestamp = str(datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
             data = self.packet_queue.get()
-            package = self.decodeIPHeader(data)
-            self.packet_recved.emit(package)
-            print("%s  --->  %s  %s IPv%s 协议：%s 数据包长度：%s Bytes" % (
-                ("\033[036m" + package['sourceAddress']).center(20, ' ') + "\033[0m",
-                "\033[035m" + package['destinationAddress'].center(20, ' ') + "\033[0m", timestamp,
-                package['version'], self.protocolClassify(package['protocol']), package['totalLength']))
+            if data:
+                package = self.decodeIPHeader(data)
+                self.packet_recved.emit(package)
+                print("%s  --->  %s  %s IPv%s 协议：%s 数据包长度：%s Bytes" % (
+                    ("\033[036m" + package['sourceAddress']).center(20, ' ') + "\033[0m",
+                    "\033[035m" + package['destinationAddress'].center(20, ' ') + "\033[0m", timestamp,
+                    package['version'], self.protocolClassify(package['protocol']), package['totalLength']))
 
-
-            # self.fillter(package,timestamp,"destinationAddress","192.168.123.54")
-    # def fillter(self, package, timestamp, fillterid, filltervalue):
-    #     if package[fillterid] == filltervalue:
-    #         print("%s  --->  %s  %s IPv%s 协议：%s 数据包长度：%s Bytes" % (
-    #             ("\033[036m" + package['sourceAddress']).center(20, ' ') + "\033[0m",
-    #             "\033[035m" + package['destinationAddress'].center(20, ' ') + "\033[0m", timestamp,
-    #             package['version'], self.protocolClassify(package['protocol']), package['totalLength']))
+    def elementchange(self):
+        self.window.ptcset.currentIndexChanged.connect(lambda: self.window.output.clear())
+        if self.window.portset.text() == '':
+            self.PORT = 0
+        else:
+            self.PORT = int(self.window.portset.text())
     @Slot(dict)
-    def outputr(self,package):
+    def outputr(self, package):
+        self.elementchange()
         timestamp = str(datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
-        result = "%s  --->  %s | %s | IPv%s | 协议：%s | 数据包长度：%s Bytes" % (
-        (package['sourceAddress']).center(20, ' '),
-        package['destinationAddress'].center(20, ' '), timestamp,
-        package['version'], self.protocolClassifys(package['protocol']), package['totalLength'])
-        self.window.output.appendPlainText(result)
+        # 获取文本框的内容
+        src_filter = self.window.srcfil.text()
+        dst_filter = self.window.dstfil.text()
+        # 获取选择的协议
+        selected_protocol_index = self.protocolfillter(self.window.ptcset.currentIndex())
+
+        if (
+                (selected_protocol_index == 0 or package['protocol'] == selected_protocol_index) and
+                (src_filter == '' or package['sourceAddress'] == src_filter) and
+                (dst_filter == '' or package['destinationAddress'] == dst_filter)
+        ):
+            result = "%s  --->  %s | %s | IPv%s | 协议：%s | 数据包长度：%s Bytes" % (
+                (package['sourceAddress']).center(20, ' '),
+                package['destinationAddress'].center(20, ' '), timestamp,
+                package['version'], self.protocolClassifys(package['protocol']), package['totalLength'])
+            self.window.output.appendPlainText(result)
+
+    def protocolfillter(self, pindex):
+        if pindex == 0:
+            return 0
+        elif pindex == 1:
+            return 6
+        elif pindex == 2:
+            return 17
+        elif pindex == 3:
+            return 1
+        elif pindex == 4:
+            return 41
+        elif pindex == 5:
+            return 50
+        elif pindex == 6:
+            return 51
+        elif pindex == 7:
+            return 89
+        elif pindex == 8:
+            return 132
+
     def protocolClassify(self, PF):
         PF = int(PF)
         if PF == 1:
@@ -119,6 +193,7 @@ class IPsniffer(QObject):
             return "SCTP"
         else:
             return "UKN"
+
     def decodeIPHeader(self, package):
         IPDatagram = {}
         IPDatagram['version'] = package[0] >> 4
