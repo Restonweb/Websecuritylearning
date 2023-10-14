@@ -18,12 +18,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QComboBox, QGridLayout, QLabel,
     QLineEdit, QPlainTextEdit, QPushButton, QSizePolicy,
     QWidget)
+import sniffer_rc
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(749, 299)
+        icon = QIcon()
+        icon.addFile(u":/icon/C:/Users/Reston/Pictures/110645632_Pixiv.jpg", QSize(), QIcon.Normal, QIcon.Off)
+        Form.setWindowIcon(icon)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
         self.dstfil = QLineEdit(Form)

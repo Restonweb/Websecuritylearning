@@ -70,29 +70,34 @@ class IPsniffer(QObject):
         self.s.close()
         return package[0]
 
-    def catchData(self):
-        while True:
-            if self.window.startsniff.isChecked():
-                self.window.startsniff.setText("停止抓取")
-                self.window.output.clear()
-                while True:
-                    data = self.catchIPData()
-                    self.packet_queue.put(data)
-                    if self.window.startsniff.isChecked() is False:
-                        self.window.startsniff.setText("抓取")
-                        self.window.selfip.setText("开始抓取以获取IP")
-                        self.s.close()
-                        break
-                    elif self.window.CF is True:
-                        self.window.selfip.setText("开始抓取以获取IP")
-                        self.s.close()
-                        raise Exception("Manual Stop：UI is closed")
-            elif self.window.CF is True:
-                self.s.close()
-                raise Exception("Manual Stop：UI is closed")
-            else:
-                continue
 
+    def catchData(self):
+        try:
+            while True:
+                if self.window.startsniff.isChecked():
+                    self.window.startsniff.setText("停止抓取")
+                    self.window.output.clear()
+                    while True:
+                        data = self.catchIPData()
+                        self.packet_queue.put(data)
+                        if self.window.startsniff.isChecked() is False:
+                            self.window.startsniff.setText("抓取")
+                            self.window.selfip.setText("开始抓取以获取IP")
+                            self.s.close()
+                            break
+                        elif self.window.CF is True:
+                            self.window.selfip.setText("开始抓取以获取IP")
+                            self.s.close()
+                            raise Exception("Manual Stop：UI is closed")
+                elif self.window.CF is True:
+                    self.s.close()
+                    raise Exception("Manual Stop：UI is closed")
+                else:
+                    continue
+        except PermissionError:
+            self.window.output.setPlainText("错误：请以管理员身份运行")
+        except Exception:
+            print("UI is closed")
     def processprintData(self):
         while True:
             timestamp = str(datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
@@ -101,9 +106,10 @@ class IPsniffer(QObject):
                 package = self.decodeIPHeader(data)
                 self.packet_recved.emit(package)
                 print("%s  --->  %s  %s IPv%s 协议：%s 数据包长度：%s Bytes" % (
-                    ("\033[036m" + package['sourceAddress']).center(20, ' ') + "\033[0m",
-                    "\033[035m" + package['destinationAddress'].center(20, ' ') + "\033[0m", timestamp,
+                    (("\033[036m" + package['sourceAddress']) + ":" + str(package['sourcePort'])).center(20, ' ') + "\033[0m",
+                    ("\033[035m" + package['destinationAddress'] + ":" + str(package['destinationPort'])).center(20, ' ') + "\033[0m", timestamp,
                     package['version'], self.protocolClassify(package['protocol']), package['totalLength']))
+
 
     def elementchange(self):
         self.window.ptcset.currentIndexChanged.connect(lambda: self.window.output.clear())
@@ -114,7 +120,7 @@ class IPsniffer(QObject):
     @Slot(dict)
     def outputr(self, package):
         self.elementchange()
-        timestamp = str(datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
+        timestamp = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         # 获取文本框的内容
         src_filter = self.window.srcfil.text()
         dst_filter = self.window.dstfil.text()
@@ -127,8 +133,8 @@ class IPsniffer(QObject):
                 (dst_filter == '' or package['destinationAddress'] == dst_filter)
         ):
             result = "%s  --->  %s | %s | IPv%s | 协议：%s | 数据包长度：%s Bytes" % (
-                (package['sourceAddress']).center(20, ' '),
-                package['destinationAddress'].center(20, ' '), timestamp,
+                (package['sourceAddress'] + ":" + str(package['sourcePort'])).center(20, ' '),
+                (package['destinationAddress'] + ":" + str(package['destinationPort'])).center(20, ' '), timestamp,
                 package['version'], self.protocolClassifys(package['protocol']), package['totalLength'])
             self.window.output.appendPlainText(result)
 
@@ -210,8 +216,14 @@ class IPsniffer(QObject):
         IPDatagram['headerCheckSum'] = (package[10] << 8) + package[11]
         IPDatagram['sourceAddress'] = "%d.%d.%d.%d" % (package[12], package[13], package[14], package[15])
         IPDatagram['destinationAddress'] = "%d.%d.%d.%d" % (package[16], package[17], package[18], package[19])
-
         IPDatagram['data'] = []
+        if IPDatagram['protocol'] == 6 or IPDatagram['protocol'] == 17:
+            tupack = package[IPDatagram['headLength']:]
+            IPDatagram['sourcePort'] = (tupack[0] << 8) + tupack[1]
+            IPDatagram['destinationPort'] = (tupack[2] << 8) + tupack[3]
+        else:
+            IPDatagram['sourcePort'] = "UKN"
+            IPDatagram['destinationPort'] = "UKN"
         step = IPDatagram['headLength'] * 4
         while step < IPDatagram['totalLength']:
             IPDatagram['data'].append(package[step])

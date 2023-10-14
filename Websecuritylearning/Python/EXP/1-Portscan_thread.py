@@ -32,7 +32,7 @@ class Portscanner(object):
                 finally:
                     s.close()
 
-    def getportlists(self, listcount=None, start_port=1, end_port=65535):
+    def getportlists(self,start_port, end_port, listcount=None):
         list50 = [21, 22, 25, 53, 80, 110, 113, 135, 139, 143, 179, 199, 443, 445, 465, 514, 548, 554, 587, 646, 993,
                   995, 1025, 1026, 1433, 1720, 1723, 2000, 3306, 3389, 5060, 5666, 5900, 6001, 8000, 8008, 8080, 8443,
                   8888, 10000, 32768, 49152, 49154]
@@ -108,22 +108,23 @@ class Portscanner(object):
             else:
                 return list(range(1, 65535 + 1))
 
-    def getipbydomain(domain):  # 域名转ip
-        try:
-            return socket.gethostbyname(domain)
-        except Exception as e:
-            print("Exception:%s||%s" % (domain, e))
-
-
 def main():
     prtscner = Portscanner()
     port_queue = queue.Queue()
     thread_num = int(input("Set thread:"))
     threads = []
     listcount = None
+    stport = 0
+    edport = 0
+    pt = input("Set Port range(Use'-'divide,leave blank to use common Portlist):")
+    if pt:
+        stport = int(pt.split('-')[0])
+        edport = int(pt.split('-')[1])
+    else:
+        listcount = input("Set Port list(50,100,1000):")
     ip = input("IP to Scan:")
     start_time = time.time()
-    portlist = prtscner.getportlists(listcount=listcount)
+    portlist = prtscner.getportlists(start_port=stport,end_port=edport,listcount=listcount)
     for port in portlist:
         port_queue.put(port)
     for t in range(thread_num):
@@ -132,6 +133,7 @@ def main():
         thread.start()
     for thread in threads:
         thread.join()
+        
     end_time = time.time()
     print("[Elapse Time] %3ss" % (end_time - start_time))
 

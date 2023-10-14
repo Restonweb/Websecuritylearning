@@ -13,29 +13,26 @@
   <property name="windowTitle">
    <string>IPSniffer</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resource/sniffer.qrc">
+    <normaloff>:/icon/C:/Users/Reston/Pictures/110645632_Pixiv.jpg</normaloff>:/icon/C:/Users/Reston/Pictures/110645632_Pixiv.jpg</iconset>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="dstfil">
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
+   <item row="2" column="3">
+    <widget class="QPushButton" name="startsniff">
+     <property name="text">
+      <string>抓取</string>
      </property>
-     <property name="placeholderText">
-      <string>留空则不进行筛选</string>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="srcfil">
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-     <property name="placeholderText">
-      <string>留空则不进行筛选</string>
-     </property>
-    </widget>
+   <item row="0" column="3">
+    <widget class="QComboBox" name="ptcset"/>
    </item>
    <item row="1" column="2">
     <widget class="QLabel" name="label_3">
@@ -72,6 +69,19 @@ background-color: rgb(173, 173, 173);</string>
      </property>
     </widget>
    </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="srcfil">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(170, 255, 255);</string>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+     <property name="placeholderText">
+      <string>留空则不进行筛选</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_2">
      <property name="font">
@@ -83,44 +93,6 @@ background-color: rgb(173, 173, 173);</string>
       <string>目的地址</string>
      </property>
     </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QLineEdit" name="portset">
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
-     </property>
-     <property name="placeholderText">
-      <string>留空则随机设定</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="startsniff">
-     <property name="text">
-      <string>抓取</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="label_4">
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>协议筛选</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="3">
-    <widget class="QComboBox" name="ptcset"/>
    </item>
    <item row="2" column="1">
     <widget class="QLabel" name="selfip">
@@ -140,8 +112,42 @@ background-color: rgb(173, 173, 173);</string>
      </property>
     </widget>
    </item>
+   <item row="1" column="3">
+    <widget class="QLineEdit" name="portset">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(170, 255, 255);</string>
+     </property>
+     <property name="placeholderText">
+      <string>留空则随机设定</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="dstfil">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(170, 255, 255);</string>
+     </property>
+     <property name="placeholderText">
+      <string>留空则不进行筛选</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_4">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>协议筛选</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resource/sniffer.qrc"/>
+ </resources>
  <connections/>
 </ui>
