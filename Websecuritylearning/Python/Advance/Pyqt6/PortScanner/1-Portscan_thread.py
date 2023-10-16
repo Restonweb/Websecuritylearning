@@ -3,7 +3,7 @@ import socket
 import queue
 import threading
 from PySide6.QtWidgets import QApplication, QWidget
-from PySide6.QtCore import Qt, Slot, Signal, QObject  # Flag Argument
+from PySide6.QtCore import Qt, Slot, Signal, QObject, QThread  # Flag Argument
 from Ui_PortScannerUI import Ui_Form
 
 
@@ -12,55 +12,35 @@ class MyWindow(QWidget, Ui_Form):
         super().__init__()
         self.setupUi(self)
 
+class Portscanner(object):
+    class Portscan(threading.Thread):
+        def __init__(self, port_queue, ip, timeout=3):
+            threading.Thread.__init__(self)
+            self.__port_queue = port_queue
+            self.__ip = ip
+            self.__timeout = timeout
 
-class PortScanner(QObject, ):
+        def run(self):
+            while True:
+                if self.__port_queue.empty():
+                    break
+                port = self.__port_queue.get(timeout=0.5)
+                ip = self.__ip
+                timeout = self.__timeout
 
-    def __init__(self):
-        super().__init__()
-        self.timeout = 3
-        self.ip = self.getLocalIP()
-        self.port_queue = queue.Queue()
-        self.app = QApplication()
-        self.window = MyWindow()
-        self.window.show()
-        self.app.exec()
-        self.scanthread = []
+                try:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.settimeout(timeout)
+                    RFlag = s.connect_ex((ip, port))
+                    if RFlag == 0:
+                        sys.stdout.write("% 6d [OPEN]\n" % port)
 
+                except Exception as e:
+                    print(e)
+                finally:
+                    s.close()
 
-    def startScan(self):
-        self.genePortQueue()
-        for i in range(int(self.window.threadcount.currentText())):
-            self.scanthread.append(self.scan    )
-
-
-    def scanPort(self):
-        port = self.port_queue.get(timeout=0.5)
-        try:
-            s = socket.socket()
-            s.settimeout(self.timeout)
-            CF = s.connect_ex((self.ip, port))
-            if CF == 0:
-                return port
-            else:
-                return False
-        except Exception as e:
-            print(e)
-        finally:
-            s.close()
-
-    def getLocalIP(self):
-        st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        st.connect(("8.8.8.8", 80))
-        LIP = st.getsockname()[0]
-        st.close()
-        return LIP
-
-    def genePortQueue(self):
-        portlist = self.getPortLists(self.window.sport, int(self.window.eport))
-        for port in portlist:
-            self.port_queue.put(port)
-
-    def getPortLists(self, start_port, end_port, listcount=None):
+    def getportlists(self, start_port, end_port, listcount=None):
         list50 = [21, 22, 25, 53, 80, 110, 113, 135, 139, 143, 179, 199, 443, 445, 465, 514, 548, 554, 587, 646, 993,
                   995, 1025, 1026, 1433, 1720, 1723, 2000, 3306, 3389, 5060, 5666, 5900, 6001, 8000, 8008, 8080, 8443,
                   8888, 10000, 32768, 49152, 49154]
@@ -123,10 +103,10 @@ class PortScanner(QObject, ):
                     54045, 54328, 55055, 55555, 55600, 56737, 57294, 57797, 58080, 60020, 60443, 61532, 61900, 62078,
                     63331, 64623, 64680, 65000, 65129, 65389]
 
-        if (listcount != None or listcount != ''):
-            if (listcount == '50'):
+        if (listcount != None):
+            if (listcount == 50):
                 return list50
-            elif (listcount == '100'):
+            elif (listcount == 100):
                 return list100
             else:
                 return list1000
@@ -137,5 +117,47 @@ class PortScanner(QObject, ):
                 return list(range(1, 65535 + 1))
 
 
+def main():
+    app = QApplication()
+    window = MyWindow()
+    startscan = Signal()
+
+    prtscner = Portscanner()
+    port_queue = queue.Queue()
+    # thread_num = int(input("Set thread:"))
+    threads = []
+    listcount = None
+    stport = 0
+    edport = 0
+    # pt = input("Set Port range(Use'-'divide,leave blank to use common Portlist):")
+    # if pt:
+    #     stport = int(pt.split('-')[0])
+    #     edport = int(pt.split('-')[1])
+    # else:
+    #     listcount = input("Set Port list(50,100,1000):")
+    # ip = input("IP to Scan:")
+    ip = "127.0.0.1"
+    start_time = time.time()
+    portlist = prtscner.getportlists(start_port=stport, end_port=edport)
+    window.show()
+    app.exec()
+    def threadcrate():
+        while True:
+            if window.startscan.isChecked():
+                for port in portlist:
+                    port_queue.put(port)
+                for t in range(10000):
+                    threads.append(prtscner.Portscan(port_queue, ip, timeout=3))
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
+
+    end_time = time.time()
+    print("[Elapse Time] %3ss" % (end_time - start_time))
+
+
 if __name__ == '__main__':
-    pts = PortScanner()
+    main()
+
+
