@@ -107,12 +107,19 @@ class Portscanner(object):
                 return list(range(start_port, end_port + 1))
             else:
                 return list(range(1, 65535 + 1))
-
+def Rflag(ip):
+    s = socket.socket()
+    s.settimeout(0.01)
+    if s.connect_ex((ip,80)) == 0:
+        s.close()
+        return False
+    else:
+        s.close()
+        return True
 def main():
     prtscner = Portscanner()
     port_queue = queue.Queue()
     thread_num = int(input("Set thread:"))
-    threads = []
     listcount = None
     stport = 0
     edport = 0
@@ -122,20 +129,46 @@ def main():
         edport = int(pt.split('-')[1])
     else:
         listcount = input("Set Port list(50,100,1000):")
-    ip = input("IP to Scan:")
-    start_time = time.time()
-    portlist = prtscner.getportlists(start_port=stport,end_port=edport,listcount=listcount)
-    for port in portlist:
-        port_queue.put(port)
-    for t in range(thread_num):
-        threads.append(prtscner.Portscan(port_queue, ip, timeout=3))
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
-        
-    end_time = time.time()
-    print("[Elapse Time] %3ss" % (end_time - start_time))
+    ip = input("IP to Scan(If Scan a range,please seprate with '-'):")
+    if (len(ip.split('-'))) == 2:
+        sip = ip.split('-')[0]
+        eip = ip.split('-')[1]
+        sid = sip.split('.')[3]
+        eid = eip.split('.')[3]
+        #192.168.123.50-192.168.123.54
+        start_time = time.time()
+        for i in range(int(sid),int(eid)+1):
+            threads = []
+            rip = sip.split('.')[:-1]
+            IP = '.'.join(rip) + '.' + str(i)
+            print("\033[036m" + "Result For " + IP + ':' + "\033[0m")
+            if Rflag(IP):
+                continue
+            portlist = prtscner.getportlists(start_port=stport, end_port=edport, listcount=listcount)
+            for port in portlist:
+                port_queue.put(port)
+            for t in range(thread_num):
+                threads.append(prtscner.Portscan(port_queue, IP, timeout=3))
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+        end_time = time.time()
+        print("[Elapse Time] %3ss" % (end_time - start_time))
+    elif (len(ip.split('-'))) == 1:
+        threads = []
+        start_time = time.time()
+        portlist = prtscner.getportlists(start_port=stport,end_port=edport,listcount=listcount)
+        for port in portlist:
+            port_queue.put(port)
+        for t in range(thread_num):
+            threads.append(prtscner.Portscan(port_queue, ip, timeout=3))
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        end_time = time.time()
+        print("[Elapse Time] %3ss" % (end_time - start_time))
 
 
 if __name__ == '__main__':

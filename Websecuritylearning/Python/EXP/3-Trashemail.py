@@ -16,8 +16,8 @@ def sendmail():
         msg["to"] = "Anotherme <" + Receiver + ">"
         rand = random.randint(0, 32767)
         msg["subject"] = "我是垃圾邮件" + str(rand)  # 随机标题内容，以免被限制
-        msg.set_content("*垃圾*" + str(rand * 2))
-        # msg.set_content(msg1 + str(rand * 2))
+        # msg.set_content("*垃圾*" + str(rand * 2))
+        msg.set_content(msg1 + str(rand * 2))
 
         server = smtplib.SMTP("smtp.qq.com", 587)
         server.starttls()  # 587端口需要使用TLS加密

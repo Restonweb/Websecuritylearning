@@ -228,6 +228,10 @@ class Ui_Form(object):
 
         self.startscan = QPushButton(Form)
         self.startscan.setObjectName(u"startscan")
+        self.startscan.setCheckable(True)
+        self.startscan.setChecked(False)
+        self.startscan.setAutoRepeat(False)
+        self.startscan.setAutoExclusive(False)
 
         self.gridLayout.addWidget(self.startscan, 7, 2, 1, 3)
 

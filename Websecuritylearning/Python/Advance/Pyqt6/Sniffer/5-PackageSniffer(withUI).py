@@ -70,7 +70,6 @@ class IPsniffer(QObject):
         self.s.close()
         return package[0]
 
-
     def catchData(self):
         try:
             while True:
@@ -98,6 +97,7 @@ class IPsniffer(QObject):
             self.window.output.setPlainText("错误：请以管理员身份运行")
         except Exception:
             print("UI is closed")
+
     def processprintData(self):
         while True:
             timestamp = str(datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
@@ -106,10 +106,12 @@ class IPsniffer(QObject):
                 package = self.decodeIPHeader(data)
                 self.packet_recved.emit(package)
                 print("%s  --->  %s  %s IPv%s 协议：%s 数据包长度：%s Bytes" % (
-                    (("\033[036m" + package['sourceAddress']) + ":" + str(package['sourcePort'])).center(20, ' ') + "\033[0m",
-                    ("\033[035m" + package['destinationAddress'] + ":" + str(package['destinationPort'])).center(20, ' ') + "\033[0m", timestamp,
+                    (("\033[036m" + package['sourceAddress']) + ":" + str(package['sourcePort'])).center(20,
+                                                                                                         ' ') + "\033[0m",
+                    ("\033[035m" + package['destinationAddress'] + ":" + str(package['destinationPort'])).center(20,
+                                                                                                                 ' ') + "\033[0m",
+                    timestamp,
                     package['version'], self.protocolClassify(package['protocol']), package['totalLength']))
-
 
     def elementchange(self):
         self.window.ptcset.currentIndexChanged.connect(lambda: self.window.output.clear())
@@ -117,6 +119,7 @@ class IPsniffer(QObject):
             self.PORT = 0
         else:
             self.PORT = int(self.window.portset.text())
+
     @Slot(dict)
     def outputr(self, package):
         self.elementchange()
