@@ -6,16 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>749</width>
-    <height>299</height>
+    <width>419</width>
+    <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>IPSniffer</string>
-  </property>
-  <property name="windowIcon">
-   <iconset resource="../resource/sniffer.qrc">
-    <normaloff>:/icon/C:/Users/Reston/Pictures/110645632_Pixiv.jpg</normaloff>:/icon/C:/Users/Reston/Pictures/110645632_Pixiv.jpg</iconset>
+   <string>抓包</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -44,16 +40,18 @@
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 0, 0);</string>
+     </property>
      <property name="text">
-      <string>端口设定</string>
+      <string>端口</string>
      </property>
     </widget>
    </item>
    <item row="3" column="0" colspan="4">
     <widget class="QPlainTextEdit" name="output">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(0, 255, 255);
-background-color: rgb(173, 173, 173);</string>
+      <string notr="true">background-color: rgb(0, 255, 127);</string>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -67,21 +65,24 @@ background-color: rgb(173, 173, 173);</string>
        <pointsize>12</pointsize>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 255, 255);</string>
+     </property>
      <property name="text">
-      <string>源地址</string>
+      <string>源</string>
      </property>
     </widget>
    </item>
    <item row="0" column="1">
     <widget class="QLineEdit" name="srcfil">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
+      <string notr="true"/>
      </property>
      <property name="readOnly">
       <bool>false</bool>
      </property>
      <property name="placeholderText">
-      <string>留空则不进行筛选</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -92,8 +93,11 @@ background-color: rgb(173, 173, 173);</string>
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 255, 0);</string>
+     </property>
      <property name="text">
-      <string>目的地址</string>
+      <string>目的</string>
      </property>
     </widget>
    </item>
@@ -105,7 +109,7 @@ background-color: rgb(173, 173, 173);</string>
       </font>
      </property>
      <property name="text">
-      <string>开始抓取以获取IP</string>
+      <string>IP</string>
      </property>
      <property name="scaledContents">
       <bool>false</bool>
@@ -118,20 +122,20 @@ background-color: rgb(173, 173, 173);</string>
    <item row="1" column="3">
     <widget class="QLineEdit" name="portset">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
+      <string notr="true"/>
      </property>
      <property name="placeholderText">
-      <string>留空则随机设定</string>
+      <string/>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
     <widget class="QLineEdit" name="dstfil">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
+      <string notr="true"/>
      </property>
      <property name="placeholderText">
-      <string>留空则不进行筛选</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -142,8 +146,11 @@ background-color: rgb(173, 173, 173);</string>
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 170, 0);</string>
+     </property>
      <property name="text">
-      <string>协议筛选</string>
+      <string>协议</string>
      </property>
     </widget>
    </item>

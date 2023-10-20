@@ -17,6 +17,9 @@
    <iconset resource="../resource/sniffer.qrc">
     <normaloff>:/icon/C:/Users/Reston/Pictures/110645632_Pixiv.jpg</normaloff>:/icon/C:/Users/Reston/Pictures/110645632_Pixiv.jpg</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="3">
     <widget class="QPushButton" name="startsniff">

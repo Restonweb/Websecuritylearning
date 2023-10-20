@@ -130,7 +130,7 @@ class IPsniffer(QObject):
         # 获取选择的协议
         selected_protocol_index = self.protocolfillter(self.window.ptcset.currentIndex())
 
-        if (
+        if (    # 过滤器
                 (selected_protocol_index == 0 or package['protocol'] == selected_protocol_index) and
                 (src_filter == '' or package['sourceAddress'] == src_filter) and
                 (dst_filter == '' or package['destinationAddress'] == dst_filter)
@@ -203,7 +203,7 @@ class IPsniffer(QObject):
         else:
             return "UKN"
 
-    def decodeIPHeader(self, package):
+    def decodeIPHeader(self, package):  # 解包IP包头字典
         IPDatagram = {}
         IPDatagram['version'] = package[0] >> 4
         IPDatagram['headLength'] = package[0] and 0x0f
@@ -217,10 +217,10 @@ class IPsniffer(QObject):
         IPDatagram['TTL'] = package[8]
         IPDatagram['protocol'] = package[9]
         IPDatagram['headerCheckSum'] = (package[10] << 8) + package[11]
-        IPDatagram['sourceAddress'] = "%d.%d.%d.%d" % (package[12], package[13], package[14], package[15])
-        IPDatagram['destinationAddress'] = "%d.%d.%d.%d" % (package[16], package[17], package[18], package[19])
+        IPDatagram['sourceAddress'] = "%d.%d.%d.%d" % (package[12], package[13], package[14], package[15])  # 源地址
+        IPDatagram['destinationAddress'] = "%d.%d.%d.%d" % (package[16], package[17], package[18], package[19])  # 目的地址
         IPDatagram['data'] = []
-        if IPDatagram['protocol'] == 6 or IPDatagram['protocol'] == 17:
+        if IPDatagram['protocol'] == 6 or IPDatagram['protocol'] == 17:  # 当为TCP包或UDP包时，解析其包头，获取源地址与目的地址的端口
             tupack = package[IPDatagram['headLength']:]
             IPDatagram['sourcePort'] = (tupack[0] << 8) + tupack[1]
             IPDatagram['destinationPort'] = (tupack[2] << 8) + tupack[3]

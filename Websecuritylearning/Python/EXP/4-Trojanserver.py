@@ -2,7 +2,6 @@ import os
 import socket
 import threading
 
-
 class cmdtrojan:
     def __init__(self):
         self.tcp = None
