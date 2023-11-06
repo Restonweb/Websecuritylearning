@@ -37,17 +37,21 @@ def xorpass():
             break
 
 def asciipass():
-    x = input("Input your sentences:")
-    asclst = []
-    reslst = []
-    for s in x:
-        asclst.append(ord(s))
-    for i in range(len(asclst)):
-        if i == 0:
-            reslst.append("chr(" + str(asclst[i]) + ')')
+    while True:
+        x = input("Input your sentences:")
+        if x:
+            asclst = []
+            reslst = []
+            for s in x:
+                asclst.append(ord(s))
+            for i in range(len(asclst)):
+                if i == 0:
+                    reslst.append("chr(" + str(asclst[i]) + ')')
+                else:
+                    reslst.append(".chr(" + str(asclst[i]) + ')')
+            print(*reslst,sep='')
         else:
-            reslst.append(".chr(" + str(asclst[i]) + ')')
-    for res in reslst:
-        print(res)
+            break
 
-asciipass()
+#asciipass()
+xorpass()
